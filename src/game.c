@@ -101,6 +101,7 @@ void choose_player_equipment(Character *player, const Inventory *database)
     printf("Do you want to customize your character?\n");
     printf("[1]: Yes\n[2]: No (Standard equipment will be used!)\n"); // Standard: Helmet - Leather; Breastplate - Iron; Weapon - sword; Health potion - 3 small, 2 medium, 1 large; 
     scanf("%d", &choose);
+    while (getchar() != '\n');
     int selected_weapon = -1;
     int selected_helmet = -1;
     int selected_breastplate = -1;
@@ -125,6 +126,7 @@ void choose_player_equipment(Character *player, const Inventory *database)
                 printf("Choose equipment for your hero:\n");
                 printf("[1]: Helmet\n[2]: Breastplate\n[3]: Weapon\n[4]: Finish character customization\n");
                 scanf("%d", &sub_choose);
+                while (getchar() != '\n');
                 switch(sub_choose)
                 {
                     case 1:
@@ -198,7 +200,7 @@ void choose_player_equipment(Character *player, const Inventory *database)
 
 void show_character(const Character *ch, const Inventory *database)
 {
-    printf("\n---=== %s ===---\n", ch->name);
+    printf("\n------====== %s ======------\n", ch->name);
     printf("HP: %.1f/%.1f\n", ch->hp, ch->max_hp);
     printf("Level: %d\n", ch->level);
     printf("Weapon: %s\n", database->items_weapon[ch->id_weapon].name);
@@ -206,11 +208,11 @@ void show_character(const Character *ch, const Inventory *database)
     printf("Breastplate: %s\n", database->items_breastplate[ch->id_breastplate].name);
     printf("Backpack: %d potions\n", 
            ch->backpack.count_health_potion);
+    printf("------======#======------\n");
 }
 
 void damage_character(Character *ch, int damage, float defence)
 {
-    ClearScreen();
     if (ch == NULL) {
         printf("Error: Character is NULL!\n");
         return;
@@ -234,51 +236,14 @@ void damage_character(Character *ch, int damage, float defence)
     
     if (ch->hp <= 0) {
         ch->is_alive = 0;
-        printf("💀 %s has been defeated! 💀\n", ch->name);
+        printf("%s has been defeated!\n", ch->name);
     }
     WaitForKey();
 }
 
-void heal(Character *ch)
-{
-    float heal = 0.0;
-    if (ch->hp <= 0 )
-    {
-        printf("%s is dead! Cannot heal!\n", ch->name);
-        return;
-    }
-    if (ch->hp >= ch->max_hp) {
-        printf("%s already has full health!\n", ch->name);
-        return;
-    }
-    if (heal < 0)
-    {
-        printf("Heal cannot be negative!\n");
-        return;
-    }
-
-    if (ch->hp <=50)
-    {
-        for (int i = ch->backpack.count_health_potion - 1; i >= 0 ; i--)
-        {
-            if (ch->backpack.items_health_potion[i].quantity > 0)
-            {
-                heal = ch->backpack.items_health_potion[i].heal;
-                break;
-            }
-        }
-    }
-
-    ch->hp += heal;
-    if (ch->hp > ch->max_hp)
-    {
-        ch->hp = ch->max_hp;
-    }
-    printf("%s restore hp: %f\n", ch->name, heal);
-}
-
 void attack_character(Character *attacker, Character *defender)
 {
+    ClearScreen();
     float damage = 0.0;
     float defence = 0.0;
     int found_weapon = 0;
@@ -334,11 +299,11 @@ void attack_character(Character *attacker, Character *defender)
         if (roll < block_chance)
         {
             damage = damage * 0.5f; 
-            printf("🛡️ %s successfully BLOCKED the attack! Damage halved!\n", defender->name);
+            printf("%s successfully BLOCKED the attack! Damage halved!\n", defender->name);
         }
         else
         {
-            printf("❌ %s tried to block, but FAILED! Taking full damage!\n", defender->name);
+            printf("%s tried to block, but FAILED! Taking full damage!\n", defender->name);
         }
     }
 
@@ -346,6 +311,71 @@ void attack_character(Character *attacker, Character *defender)
 }
 
 void use_health_potion(Character *player)
-{
-    
+{   
+    ClearScreen();
+    if (player->backpack.count_health_potion == 0)
+    {
+        printf("You don't have any health potions in your backpack!\n");
+        WaitForKey();
+        return;
+    }
+    int num = 0;
+    int choose = 0;
+    int potion_indexes[5];
+    printf("Health potions in inventory:\n");
+    for (int i = 0; i < player->backpack.count_health_potion; i++)
+    {
+        if (player->backpack.items_health_potion[i].quantity > 0)
+        {
+            num += 1;
+            potion_indexes[num] = i; 
+            printf("[%d]: %s (heal %.1f) - %d\n", 
+                num, 
+                player->backpack.items_health_potion[i].name,
+                player->backpack.items_health_potion[i].heal, 
+                player->backpack.items_health_potion[i].quantity
+            );
+        }
+    }
+    if (num == 0)
+    {
+        printf("All your potion slots are empty!\n");
+        WaitForKey();
+        return;
+    }
+    printf("[%d]: Cancel\n", num+1);
+    printf("Which one do you want to use?\n");
+    if (scanf("%d", &choose) != 1) 
+    {
+        while (getchar() != '\n');
+        printf("Incorrect input!\n");
+        WaitForKey();
+        return;
+    }
+    if (choose == num+1)
+    {
+        printf("Healing canceled.\n");
+        return;
+    }
+    while (getchar() != '\n');
+    if (choose > 0 && choose <= num)
+    {
+        int real_index = potion_indexes[choose];
+        player->hp += player->backpack.items_health_potion[real_index].heal;
+        if (player->hp > player->max_hp)
+        {
+            player->hp = player->max_hp;
+        }
+
+        printf("You used %s and restored %.1f HP!\n", 
+               player->backpack.items_health_potion[real_index].name, 
+               player->backpack.items_health_potion[real_index].heal);
+
+        player->backpack.items_health_potion[real_index].quantity--;
+    }
+    else
+    {
+        printf("Incorrect ID!\n");
+    }
+    WaitForKey();
 }

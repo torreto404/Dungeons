@@ -2,7 +2,6 @@
 #define GAME_H
 
 void attack_character(Character *attacker, Character *defender);
-void heal(Character *ch);
 void damage_character(Character *ch, int damage, float defence);
 void show_character(const Character *ch, const Inventory *database);
 void choose_player_equipment(Character *player, const Inventory *database);

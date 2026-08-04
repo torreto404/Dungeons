@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-void enemy_ai_turn();
+void enemy_ai_turn(Character *enemy, Character *hero);
 
 #endif

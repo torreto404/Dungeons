@@ -55,6 +55,7 @@ int main()
     printf("#############################################\n");
     printf("Choose action:\n[1]: Start game\n[2]: Exit\n");
     scanf("%d", &choose);
+    while (getchar() != '\n'); 
     switch(choose)
     {
         case 1:

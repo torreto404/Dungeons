@@ -3,6 +3,7 @@
 
 #include "combat.h"
 #include "game.h"
+#include "ai.h"
 
 void print_turn(int turn)
 {
@@ -22,6 +23,7 @@ void start_battle(Character *player, Character *enemy, Inventory *database)
 	WaitForKey();
 	while(player->is_alive && enemy->is_alive)
 	{
+		player->is_blocking = 0;
 		print_turn(turn);
 		show_character(player, database);
 		show_character(enemy, database);
@@ -33,24 +35,41 @@ void start_battle(Character *player, Character *enemy, Inventory *database)
 		{
 			case 1:
 				attack_character(player, enemy);
-				WaitForKey();
 				break;
 			case 2:
+				ClearScreen();
 				player->is_blocking = 1;
-				printf("🛡️ You raised your shield and prepared to block!\n");
+				printf("You raised your shield and prepared to block!\n");
 				WaitForKey();
 				break;
 			case 3:
 				use_health_potion(player);
-				WaitForKey();
 				break;
 			default:
 				printf("Incorrect input!");
 				WaitForKey();
 				exit(0);
 		}
+
+		if(!enemy->is_alive)
+		{
+			break;
+		}
+
+		ClearScreen();
+		enemy->is_blocking = 0;
+		enemy_ai_turn(enemy, player);
+		WaitForKey();
 	
 		turn++;
 	}
+
+	if (player->is_alive) {
+        printf("\n YOU WIN! Victory is yours! \n");
+    } else {
+        printf("\n GAME OVER! You have been defeated...\n");
+    }
+    WaitForKey();
+
 	return;
 }
