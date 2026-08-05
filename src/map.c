@@ -7,7 +7,7 @@
 #include "combat.h"
 #include "character.h"
 
-void print_dungeon(char dungeon[][MAP_WIDTH], Position hero_pos)
+void print_dungeon(char dungeon[][MAP_WIDTH], int dungeon_fog[][MAP_WIDTH], Position hero_pos)
 {
     for (int i = 0; i < MAP_HEIGHT; i++)
     {
@@ -17,12 +17,33 @@ void print_dungeon(char dungeon[][MAP_WIDTH], Position hero_pos)
             {
                 printf("@");
             }
-            else
+            else if (dungeon_fog[i][j] == 1)
             {
                 printf("%c", dungeon[i][j]);
             }
+            else
+            {
+                printf(" ");
+            }
         }
         printf("\n");
+    }
+}
+
+void fog_dissipation(int dungeon_fog[][MAP_WIDTH], Position hero_pos)
+{
+    for (int dy = -1; dy <= 1; dy++)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            int target_x = hero_pos.x + dx;
+            int target_y = hero_pos.y + dy;
+
+            if (target_x >= 0 && target_x < MAP_WIDTH && target_y >= 0 && target_y < MAP_HEIGHT) 
+            {
+                dungeon_fog[target_y][target_x] = 1;
+            }
+        }
     }
 }
 
@@ -36,13 +57,24 @@ void start_floor_exploration(Character *player, const Inventory *database)
 {
     char dungeon[MAP_HEIGHT][MAP_WIDTH] = 
     {
-        {'#', '#', '#', '#', '#','#','#'},
-        {'#', '.', '.', '.', '.','.','#'},
-        {'#', '.', '#', '.', '#','#','#'},
-        {'#', '.', '#', '.', '.','.','#'},
-        {'#', '.', '#', '.', '#','.','#'},
-        {'#', '.', '.', '.', '#','B','#'},
-        {'#', '#', '#', '#', '#','#','#'}
+        {'#', '#', '#', '#', '#', '#', '#'},
+        {'#', '.', '.', '.', '.', '.', '#'},
+        {'#', '.', '#', '.', '#', '#', '#'},
+        {'#', '.', '#', '.', '.', '.', '#'},
+        {'#', '.', '#', '.', '#', '.', '#'},
+        {'#', '.', '.', '.', '#', 'B', '#'},
+        {'#', '#', '#', '#', '#', '#', '#'}
+    };
+
+    int dungeon_fog[MAP_HEIGHT][MAP_WIDTH] = 
+    {
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0}
     };
 
     Position hero_pos = {3, 3};
@@ -53,9 +85,10 @@ void start_floor_exploration(Character *player, const Inventory *database)
     int exploring = 1;
     while (exploring && player->is_alive)
     {
+        fog_dissipation(dungeon_fog, hero_pos);
         ClearScreen();
         printf("=== DUNGEON FLOOR ===\n\n");
-        print_dungeon(dungeon, hero_pos);
+        print_dungeon(dungeon, dungeon_fog, hero_pos);
         printf("Select the direction of movement:\n");
         printf("[W]: Up\n[A]: Left\n[D]: Right\n[S]: Down\n");
         scanf(" %c", &move);
@@ -130,7 +163,7 @@ void start_floor_exploration(Character *player, const Inventory *database)
         {
             int encounter_roll = rand() % 100;
 
-            if (encounter_roll < 35)
+            if (encounter_roll < 25) // 25%
             {
                 ClearScreen();
                 printf("Danger! An enemy jumps out of the shadows!\n");
