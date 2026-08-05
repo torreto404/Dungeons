@@ -3,6 +3,12 @@
 
 typedef struct
 {
+	int x;
+	int y;
+} Position;
+
+typedef struct
+{
 	int id;
 	char name[20];
 	int damage;

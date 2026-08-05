@@ -13,7 +13,7 @@ void print_turn(int turn)
     printf("############################################\n");
 }
 
-void start_battle(Character *player, Character *enemy, Inventory *database)
+void start_battle(Character *player, Character *enemy, const Inventory *database)
 {
 	int turn = 0;
 	int choose;

@@ -148,6 +148,7 @@ void choose_player_equipment(Character *player, const Inventory *database)
                                 player,                 // ch
                                 name,                   // name
                                 100.0,                  // hp
+                                100.0,                  // mx_hp
                                 selected_weapon,        // weapon ID
                                 selected_helmet,        // helmet ID
                                 selected_breastplate,   // breastplate ID
@@ -175,6 +176,7 @@ void choose_player_equipment(Character *player, const Inventory *database)
                 player,     // ch
                 name,       // name
                 100.0,      // hp
+                100.0,      // max_hp
                 0,          // weapon ID
                 1,          // helmet ID
                 2,          // breastplate ID

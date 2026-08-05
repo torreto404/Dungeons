@@ -10,6 +10,7 @@
 #include "character.h"
 #include "game.h"
 #include "combat.h"
+#include "map.h"
 
 
 int main()
@@ -24,31 +25,9 @@ int main()
     srand(time(NULL));
     int choose;
     Character hero;
-    Character enemy;
     Inventory database;
 
     init_game_database(&database);
-
-    init_character(
-        &enemy,             // ch
-        "James_The_Enemy",  // name
-        100.0,              // hp
-        2,                  // weapon ID
-        1,                  // helmet ID
-        1,                  // breastplate ID
-        1,                  // is_alive = true
-        0                   // is_blocking = false
-    );
-    setup_character_loadout(
-        &enemy,             // ch
-        &database,          // pool of items
-        2,                  // weapon ID
-        1,                  // helmet ID 
-        1,                  // breastplate ID 
-        1,                  // small health potion count
-        1,                  // medium health potion count
-        0                   // large health potion count
-    );
 
     printf("#############################################\n");
     printf("#           Welcome to the game!            #\n");
@@ -62,7 +41,7 @@ int main()
             ClearScreen();
             choose_player_equipment(&hero, &database);
             ClearScreen();
-            start_battle(&hero, &enemy, &database);
+            start_floor_exploration(&hero, &database);
             break;
         case 2:
             exit(0);

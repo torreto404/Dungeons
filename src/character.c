@@ -2,12 +2,12 @@
 #include "init.h"
 #include <string.h>
 
-void init_character(Character *ch, char * name, float hp, int id_weapon, int id_helmet, int id_breastplate, int is_alive, int is_blocking)
+void init_character(Character *ch, char * name, float hp, float max_hp, int id_weapon, int id_helmet, int id_breastplate, int is_alive, int is_blocking)
 {
     strncpy(ch->name, name, 19);
     ch->name[19] = '\0';
     ch->hp = hp;
-    ch->max_hp = 100.0;
+    ch->max_hp = max_hp;
     ch->level = 10;
     ch->is_alive = is_alive;
     ch->is_blocking = is_blocking;
